@@ -1,0 +1,51 @@
+#include <SoftwareSerial.h>
+#include <TinyGPS++.h>
+
+// Define the serial connections to the GPS and GSM modules
+SoftwareSerial gpsSerial(4, 3); // RX, TX for GPS
+SoftwareSerial gsmSerial(7, 8); // RX, TX for GSM
+
+// Create a GPS object
+TinyGPSPlus gps;
+
+void setup() {
+  // Start the serial communication
+  Serial.begin(9600);
+  gpsSerial.begin(9600);
+  gsmSerial.begin(9600);
+
+  // Initialize GSM module
+  initGSM();
+}
+
+void loop() {
+  // Read data from the GPS module
+  while (gpsSerial.available()) {
+    if (gps.encode(gpsSerial.read())) {
+      if (gps.location.isUpdated()) {
+        // GPS location is updated
+        sendSMS(gps.location.lat(), gps.location.lng());
+      }
+    }
+  }
+}
+
+void initGSM() {
+  gsmSerial.println("AT"); // Check connection
+  delay(1000);
+  gsmSerial.println("AT+CMGF=1"); // Set SMS mode to text
+  delay(1000);
+  // More initialization commands can be added here if needed
+}
+
+void sendSMS(double lat, double lng) {
+  String message = "Location: Lat = " + String(lat, 6) + " Long = " + String(lng, 6);
+
+  gsmSerial.println("AT+CMGS=\"+1234567890\""); // Replace with recipient's number
+  delay(1000);
+  gsmSerial.println(message); // Send the SMS content
+  delay(1000);
+  gsmSerial.write(26); // Send Ctrl+Z/ASCII SUB to indicate end of message
+}
+
+// Add any additional functions or error handling as needed
