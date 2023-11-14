@@ -1,0 +1,59 @@
+const int trigPin0 = 4;
+const int echoPin0 = 5;
+const int buzz0 = 8;
+
+const int trigPin1 = 6;
+const int echoPin1 = 7;
+const int buzz1 = 9;
+
+// New sensor and buzzer
+const int trigPin2 = 10; // Example pin for trig
+const int echoPin2 = 11; // Example pin for echo
+const int buzz2 = 12;   // Example pin for buzzer
+
+float duration0, distance0;
+float duration1, distance1;
+float duration2, distance2; // Variables for the new sensor
+
+unsigned long previousMillis0 = 0;
+unsigned long previousMillis1 = 0;
+unsigned long previousMillis2 = 0; // Timer for the new buzzer
+
+unsigned long interval0 = 1000;
+unsigned long interval1 = 1000;
+unsigned long interval2 = 1000; // Interval for the new buzzer
+
+bool buzzerState0 = LOW;
+bool buzzerState1 = LOW;
+bool buzzerState2 = LOW; // State for the new buzzer
+
+void setup() {
+  // Setup for the first two sensors and buzzers remains unchanged
+
+  pinMode(trigPin2, OUTPUT);
+  pinMode(echoPin2, INPUT);
+  pinMode(buzz2, OUTPUT);
+  digitalWrite(buzz2, LOW);
+
+  Serial.begin(9600);
+}
+
+void loop() {
+  unsigned long currentMillis = millis();
+
+  // Existing code for the first two sensors and buzzers remains unchanged
+
+  // New sensor and buzzer logic
+  distance2 = getDistance(trigPin2, echoPin2);
+  Serial.print("Distance2: ");
+  Serial.println(distance2);
+
+  if (distance2 <= 50) {
+    interval2 = map(distance2, 10, 150, 50, 1000);
+    handleBuzzer(buzz2, previousMillis2, interval2, buzzerState2, currentMillis);
+  } else {
+    digitalWrite(buzz2, LOW); // Turn off buzzer if out of range
+  }
+}
+
+// getDistance() and handleBuzzer() functions remain unchanged
